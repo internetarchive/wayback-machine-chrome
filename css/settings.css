@@ -1,7 +1,7 @@
 #settingPage {
     height: 458px;
     max-height: 458px;
-    overflow: hidden;
+    overflow: wrap;
 }
 
 #general {
@@ -20,18 +20,22 @@ button:focus {
 
 /* navgation bar */
 ul.nav {
+    background-color: #d0d0d0;
     list-style-type: none;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 4px 4px 7px;
     overflow: hidden;
 }
 
 li.section {
     float: left;
-    margin-left: 2px;
+    margin-left: 4px;
     margin-top: 5px;
     border-width: 0 0 1px 0;
     border-radius: 4px;
+    background-color: #25a7b0;
+    border: solid 2px #25a7b0;
+    width: 60px;
 }
 
 li.section span.section {
@@ -41,25 +45,16 @@ li.section span.section {
 
 span.section {
     text-align: center;
-    padding: 1px 18px 3px 18px;
-    font-size: 15px;
+    font-size: 13px;
 }
 
-li.section:nth-child(1) {
-    background-color: #d63c24f2;
-    border-top: solid 2px #d63c24f2;
-    border-right: solid 2px #d63c24f2 ;
-    border-left: solid 4px #d63c24f2;
-    margin-left: 4px;
-}
-
-li.section:nth-child(2) {
+/* li.section:nth-child(2) {
     margin-left: 3.5px;
     background-color: #25a7b0;
     border-top: solid 2px #25a7b0;
     border-left: solid 2px #25a7b0 ;
     border-right: solid 4px #25a7b0;
-}
+} */
 
 li.section:active {
     opacity: 0.5;
@@ -69,6 +64,8 @@ li.selected {
     font-size: 12px;
     border-left: 2px;
     margin-top: 3px;
+    background-color: #489C3E;
+    border: solid 2px #489C3E;
 }
 
 .unselectable {
@@ -78,6 +75,10 @@ li.selected {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.setting_list{
+  height:380px;
 }
 
 /* options */
