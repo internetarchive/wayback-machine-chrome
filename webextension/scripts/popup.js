@@ -429,11 +429,25 @@ function show_wikibooks() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     const url = tabs[0].url
     if (url.match(/^https?:\/\/[\w\.]*wikipedia.org/)) {
-      chrome.runtime.sendMessage({ message: 'getToolbarState', atab: tabs[0] }, (result) => {
+      chrome.runtime.sendMessage({ message: 'getToolbarState', atab: tabs[0] }, async (result) => {
         let state = (result && result.stateArray) ? new Set(result.stateArray) : new Set()
         if (state.has('R')) {
+          var show_books = await wikiDetails('getWikipediaBooks', url)
+          var show_papers = await wikiDetails('getCitedPapers', url)
+          if (show_books && show_papers) {
+            $('#wiki-container').show()
+          } else if (show_books) {
+            $('#wikibooks-btn').addClass('btn-wide')
+            $('#wikipapers-btn').hide()
+            $('#wiki-container').show()
+          } else {
+            $('#wikipapers-btn').addClass('btn-wide')
+            $('#wikipapers-btn').attr('style', 'margin-left: 0px !important');
+            $('#wikibooks-btn').hide()
+            $('#wiki-container').show()
+          }
+
           // show wikipedia cited books & papers buttons
-          $('#wiki-container').show()
           $('#wikibooks-btn').click(() => {
             const URL = chrome.runtime.getURL('booklist.html') + '?url=' + url
             openByWindowSetting(URL)
@@ -445,6 +459,21 @@ function show_wikibooks() {
         }
       })
     }
+  })
+}
+
+function wikiDetails (message, query) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({
+      message,
+      query
+    }, (result) => {
+      if (result && result.status !== 'error') {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    })
   })
 }
 
@@ -607,13 +636,14 @@ chrome.runtime.onMessage.addListener(
   }
 )
 
-window.onloadFuncs = [last_save, borrow_books, show_news, show_wikibooks, search_box_activate, setupWaybackCount, setupSaveButton, setUpFactCheck]
+window.onloadFuncs = [last_save, borrow_books, show_news, search_box_activate, setupWaybackCount, setupSaveButton, setUpFactCheck]
 window.onload = () => {
   for (var i in this.onloadFuncs) {
     this.onloadFuncs[i]()
   }
 }
 
+$(show_wikibooks)
 $(setupSettingsTabTip)
 
 $('.logo-wayback-machine').click(homepage)

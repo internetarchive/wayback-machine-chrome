@@ -49,7 +49,7 @@
   "content_scripts": [
     {
       "matches": ["http://*.wikipedia.org/*", "https://*.wikipedia.org/*"],
-      "js": ["scripts/build.js", "scripts/utils.js", "scripts/wikipedia.js", "scripts/wikipedia_loader.js"],
+      "js": ["scripts/build.js", "scripts/utils.js", "scripts/wikipedia.js"],
       "css": ["css/style.css", "css/wikipedia.css"]
     }
   ],

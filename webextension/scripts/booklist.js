@@ -1,14 +1,14 @@
 // booklist.js
 
 // from 'utils.js'
-/*   global openByWindowSetting */
+/*   global openByWindowSetting, getUrlByParameter */
 
 // from 'wikipedia.js'
 /*   global wikipediaBooks, getMetadata */
 
 // TODO: rename getMetadata in doi.js or wikipedia.js
 
-// This is called from booklist_loader.js
+// This runs every time booklist.html is viewed.
 // It retrieves a list of book cover images.
 function populateBooks(url) {
   // Gets the data for each book on the wikipedia url
@@ -48,6 +48,11 @@ function addBook (metadata) {
     })
   )
   return $('<div>').append(text_elements, details)
+}
+
+window.onload = () => {
+  var url = getUrlByParameter('url')
+  populateBooks(url)
 }
 
 if (typeof module !== 'undefined') {

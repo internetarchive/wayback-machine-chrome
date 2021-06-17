@@ -62,25 +62,46 @@ function makeEntry (data) {
 function createPage () {
   let container = $('#container-whole-doi')
   const url = getUrlByParameter('url')
-  $.getJSON(hostURL + 'services/context/papers?url=' + url, (response) => {
+  getPapers(url)
+  .then((papers) => {
     $('.loader').hide()
-    if (response.status && response.status === 'error') {
-      $('#error-msg').html(response.message)
-    } else {
-      for (var i = 0; i < response.length; i++) {
-        if (response[i]) {
-          let data = getMetadata(response[i])
-          let paper = makeEntry(data)
-          // add to list
-          if (data.url !== '#') {
-            container.prepend(paper)
-          } else {
-            container.append(paper)
-          }
+    for (var i = 0; i < papers.length; i++) {
+      if (papers[i]) {
+        let data = getMetadata(papers[i])
+        let paper = makeEntry(data)
+        // add to list
+        if (data.url !== '#') {
+          container.prepend(paper)
+        } else {
+          container.append(paper)
         }
       }
     }
   })
+  .catch((err) => {
+    $('.loader').hide()
+    $('#error-msg').html(err)
+  })
+}
+
+function getPapers(url) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({
+      message: 'getCitedPapers',
+      query: url
+    }, (papers) => {
+      if (papers && papers.status !== 'error') {
+        resolve(papers)
+      } else {
+        reject(new Error('Papers not found'))
+      }
+    })
+  })
+}
+
+// If not running through mocha, then only execute
+if (!isInTestEnv) {
+  window.onload = createPage
 }
 
 if (typeof module !== 'undefined') {

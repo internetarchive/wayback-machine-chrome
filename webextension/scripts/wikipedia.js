@@ -1,34 +1,35 @@
 // wikipedia.js
-//
+// This file is loaded every time URL matches '*.wikipedia.org/*' as defined in manifest.json.
 // This script adds buttons next to isbns on wikipedia pages that will redirect
 // the user to a readable digital copy of the referenced book.
 
 // from 'utils.js'
-/*   global attachTooltip */
+/*   global attachTooltip, isNotExcludedUrl */
 
-// This is called from wikipedia_loader.js
 function addCitations () {
-  wikipediaBooks(location.href).then((data) => {
-    let books = $("a[title^='Special:BookSources']")
-    for (let book of books) {
-      let isbn = book.text.replace(/-/g, '')
-      let id = getIdentifier(data[isbn])
-      let metadata = getMetadata(data[isbn])
-      let page = getPageFromCitation(book)
-      if (id) {
-        let icon = addReadIcon(id, metadata)
-        if (page) {
-          icon[0].href += '/page/' + page
+  if (isNotExcludedUrl(location.href)) {
+    wikipediaBooks(location.href).then((data) => {
+      let books = $("a[title^='Special:BookSources']")
+      for (let book of books) {
+        let isbn = book.text.replace(/-/g, '')
+        let id = getIdentifier(data[isbn])
+        let metadata = getMetadata(data[isbn])
+        let page = getPageFromCitation(book)
+        if (id) {
+          let icon = addReadIcon(id, metadata)
+          if (page) {
+            icon[0].href += '/page/' + page
+          }
+          book.parentElement.append(icon[0])
+        } else {
+          let icon = addDonateIcon(isbn)
+          book.parentElement.append(icon[0])
         }
-        book.parentElement.append(icon[0])
-      } else {
-        let icon = addDonateIcon(isbn)
-        book.parentElement.append(icon[0])
       }
-    }
-  }).catch((error) => {
-    console.log(error)
-  })
+    }).catch((error) => {
+      console.log(error)
+    })
+  }
 }
 
 function getMetadata (book) {
@@ -163,6 +164,12 @@ function wikipediaBooks (url) {
     })
   })
 }
+
+chrome.storage.local.get(['wiki_setting'], (settings) => {
+  if (settings && settings.wiki_setting) {
+    addCitations()
+  }
+})
 
 if (typeof module !== 'undefined') {
   module.exports = {

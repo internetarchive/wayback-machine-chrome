@@ -1,7 +1,7 @@
 // recommendations.js
 
 // from 'utils.js'
-/*   global openByWindowSetting */
+/*   global openByWindowSetting, getUrlByParameter */
 
 const threshold = 0.85
 
@@ -70,6 +70,11 @@ function getArticles(url) {
       $('<p>').text(err).css({ 'margin': 'auto' })
     )
   })
+}
+
+// If not running through mocha, then only execute
+if (!isInTestEnv) {
+  getArticles(getUrlByParameter('url'))
 }
 
 if (typeof module !== 'undefined') {

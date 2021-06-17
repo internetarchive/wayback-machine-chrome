@@ -315,6 +315,11 @@ function getCachedBooks(url, onSuccess, onFail) {
   fetchCachedAPI(requestUrl, onSuccess, onFail)
 }
 
+function getCachedPapers(url, onSuccess, onFail) {
+  const requestUrl = hostURL + 'services/context/papers?url=' + fixedEncodeURIComponent(url)
+  fetchCachedAPI(requestUrl, onSuccess, onFail)
+}
+
 function getCachedTvNews(url, onSuccess, onFail) {
   const requestUrl = hostURL + 'services/context/tvnews?url=' + fixedEncodeURIComponent(url)
   fetchCachedAPI(requestUrl, onSuccess, onFail)
@@ -446,6 +451,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       (json) => { sendResponse(json) },
       (error) => { sendResponse({ error: error }) }
     )
+  } else if (message.message === 'getCitedPapers') {
+    // retrieve wikipedia books
+    getCachedPapers(message.query,
+      (json) => { sendResponse(json) },
+      (error) => { sendResponse({ error: error }) }
+    )
   } else if (message.message === 'tvnews') {
     // retrieve tv news clips
     getCachedTvNews(message.article,
@@ -554,6 +565,15 @@ chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
             }
           }, () => {}
         )
+        if (!getToolbarState(tab).has('R')) {
+          getCachedPapers(clean_url,
+            (data) => {
+              if (data && (data.status !== 'error')) {
+                addToolbarState(tab, 'R')
+              }
+            }, () => {}
+          )
+        }
       }
       // checking tv news
       const news_host = new URL(clean_url).hostname
